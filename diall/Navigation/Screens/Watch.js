@@ -1,29 +1,56 @@
-import React from 'react';
-import { View,FlatList } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { View, FlatList, StyleSheet, Dimensions } from 'react-native';
 import VedioFeed from '../../Components/VedioFeed';
 
-// import { Container } from './styles';
 
-const Watch = ({navigation}) => {
-    const videoData = [
-        { id: '1', url: 'https://www.youtube.com/shorts/n1dPik4LzIE' },
-        { id: '2', url: 'https://youtube.com/shorts/2ox6SllUD2o?feature=share' },
-        // Add more video URLs as needed
-      ];
-    
-      const renderVideoItem = ({ item }) => <VedioFeed videoUrl={item.url} />;
-    
-      return (
-        <FlatList
-          data={videoData}
-          renderItem={renderVideoItem}
-          keyExtractor={(item) => item.id}
-          showsVerticalScrollIndicator={false}
-        />
-      );
+const Watch = ({ navigation }) => {
+
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const videoData = [
+    { id: '1', url: 'https://www.youtube.com/shorts/n1dPik4LzIE' },
+    { id: '2', url: 'https://youtube.com/shorts/2ox6SllUD2o?feature=share' },
+    // Add more video URLs as needed
+  ];
+  const onViewableItemsChanged = ({ viewableItems }) => {
+    const activeItem = viewableItems[0];
+    if (activeItem) {
+      setActiveIndex(activeItem.index);
+    }
+  };
+  const viewabilityConfigCallbackPairs = useRef([
+  
+    {   viewabilityConfig: {
+      viewAreaCoveragePercentThreshold: 50,
+    },
+    onViewableItemsChanged },
+  ]);
+
+  const renderVideoItem = ({ item,index }) => <VedioFeed videoUrl={item.url} isCurrent={index === activeIndex}/>;
+
+  return (
+    <View style={styles.veideoFeedSpace}>
+      <FlatList
+        data={videoData}
+        renderItem={renderVideoItem}
+        keyExtractor={(item) => item.id}
+        pagingEnabled
+        showsVerticalScrollIndicator={false}
+        viewabilityConfigCallbackPairs={
+          viewabilityConfigCallbackPairs.current
+        }
+        
+      />
+    </View>
+
+  );
 }
 
+const styles = StyleSheet.create({
+  veideoFeedSpace: {
+    height: Dimensions.get('window').height
+  }
+})
 
 
-  
 export default Watch;
