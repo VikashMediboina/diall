@@ -26,7 +26,7 @@ Make sure you have the following dependencies installed before running the proje
     git clone https://github.com/your-username/project-name.git
 ```
 ```bash
-    cd project-name
+    cd diall/diall/
 ```
 
 2. **Install Dependencies**
