@@ -1,11 +1,12 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { View, TouchableOpacity, StyleSheet, Animated, Text ,Dimensions,Share} from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Animated, Text ,Dimensions,Share,Platform, Image,TouchableWithoutFeedback} from 'react-native';
 // import Video from 'react-native-video';
 import Icon from 'react-native-vector-icons/Ionicons';
 // import { Video } from 'expo-av';
 import { Video, ResizeMode } from 'expo-av';
 import * as Sharing from 'expo-sharing';
 import { useNavigation,useIsFocused } from '@react-navigation/native';
+import LinearProgressBar from './LinearProgressBar';
 
 const VedioFeed = ({ videoUrl,isCurrent }) => {
   const [isPlaying, setIsPlaying] = useState(true);
@@ -57,9 +58,12 @@ const VedioFeed = ({ videoUrl,isCurrent }) => {
     }
   };
 
-  const onLoad = (data) => {
-    setVideoDuration(data.duration);
-    setCurrentPosition(0);
+  const handlePlaybackStatusUpdate = (data) => {
+    if(data.isLoaded){
+      setVideoDuration(data.durationMillis);
+      setCurrentPosition(0);
+    }
+    
   };
 
   
@@ -67,14 +71,14 @@ const VedioFeed = ({ videoUrl,isCurrent }) => {
     if (isPlaying) {
       const interval = setInterval(async () => {
         const { positionMillis } = await videoPlayer.current.getStatusAsync();
-        setCurrentPosition(positionMillis / 1000);
+        setCurrentPosition((positionMillis / videoDuration) * 100);
         const progress = (positionMillis / videoDuration) * 100;
         Animated.timing(progressAnimation, {
           toValue: progress,
-          duration: 1000, // Adjust animation duration as needed
+          duration: 50, // Adjust animation duration as needed
           useNativeDriver: false,
         }).start();
-      }, 1000);
+      }, 50);
       return () => clearInterval(interval);
     }
   }, [isPlaying, videoDuration]);
@@ -110,24 +114,39 @@ const VedioFeed = ({ videoUrl,isCurrent }) => {
     return unsubscribe;
   }, [navigation]);
 
-
-
+  const getbottomBox = () => {
+    if (Platform.OS === 'ios') {
+      return {bottom:80};
+    }
+    return {bottom:20};
+  };
+const getPlayColor=()=> isPlaying?'black':'white'
   return (
-    <View style={styles.videoContainer}>
+    <View style={[styles.videoContainer]}>
       <TouchableOpacity onPress={onVideoPress}>
 
         <Video
           ref={videoPlayer}
           source={{ uri: 'https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4' }}
-          useNativeControls={true}
+          useNativeControls={false}
           isLooping
-          style={styles.video}
-          onLoad={onLoad}
+          style={[styles.video,{tintColor:getPlayColor()}]}
+          onLoad={handlePlaybackStatusUpdate}
           resizeMode="cover"
           shouldPlay={isPlaying}
+          
         />
+    {!isPlaying && <View style={styles.overlay} />}
       </TouchableOpacity>
-      <View style={styles.videoInfoContainer}>
+      <TouchableWithoutFeedback onPress={onVideoPress}>
+      <View style={styles.videoContainer}>
+        {/* Conditional rendering of image */}
+        {!isPlaying && <Image source={require('diall/assets/Play.png')} style={styles.centeredImage} />}
+      </View>
+      </TouchableWithoutFeedback>
+           
+
+      <View style={styles.videoInfoContainer} >
         <Animated.View style={[styles.progressIndicator, {
           width: progressAnimation.interpolate({
             inputRange: [0, 100],
@@ -135,8 +154,12 @@ const VedioFeed = ({ videoUrl,isCurrent }) => {
           })
         }]} />
         <TouchableOpacity style={styles.shareButton} onPress={onShare}>
-          <Icon name="share" size={20} color="#ffffff" />
+          {/* <Icon name="share" size={20} color="#ffffff" /> */}
+          <Image source={require('diall/assets/Send.png')} color="#ffffff"/>
         </TouchableOpacity>
+        {isFocused&&<View style={[{position:'absolute'},getbottomBox()]}>
+        <LinearProgressBar progress={currentPosition} width={Dimensions.get('window').width} height={5}/>
+        </View>}
       </View>
     </View>
   );
@@ -149,19 +172,29 @@ const styles = StyleSheet.create({
     position: 'relative',
     alignContent: 'center',
     // alignItems:'center',
-    justifyContent: 'center'
-  },
+    justifyContent: 'center'  },
   video: {
     height: Dimensions.get('window').height,
     width:Dimensions.get('window').width,
   },
   shareButton: {
     position: 'absolute',
-    bottom: 80,
+    bottom: 90,
     right: 10,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    // backgroundColor: 'rgba(0, 0, 0, 0.6)',
     padding: 5,
     borderRadius: 20,
+  },
+  centeredImage: {
+    width: 60,
+    height: 70,
+    position: 'absolute',
+    alignSelf: 'center',
+    bottom:Dimensions.get('window').height/2
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Dark overlay color
   },
 });
 export default VedioFeed
