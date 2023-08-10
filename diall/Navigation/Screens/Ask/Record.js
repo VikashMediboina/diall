@@ -8,7 +8,7 @@ import { Video } from 'expo-av';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { useFocusEffect } from '@react-navigation/native';
 import Svg, { Circle, Rect } from 'react-native-svg';
-import ToolTip from '../../../Components/ToolTip';
+import CustomToolTip from '../../../Components/CustomToolTip';
 
 
 const Record = ({ navigation }) => {
@@ -174,13 +174,12 @@ const Record = ({ navigation }) => {
 
                                         <Circle cx="70" cy="70" r="36.5" stroke="white" strokeWidth="7" fill="none" shapeRendering="crispEdges" />
                                     </Svg>
-
                                 </TouchableOpacity>
                             )}
                         </View>
                     </Camera>}
                     <View style={{position:'absolute',top:50,right:40}}>
-                   <ToolTip />
+                   <CustomToolTip />
                         </View>
                 </View>
 

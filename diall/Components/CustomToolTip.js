@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, Modal, StyleSheet, UIManager, findNodeHan
 import Icon from 'react-native-vector-icons/Feather';
 
 
-const ToolTip = () => {
+const CustomToolTip = () => {
   const [isTooltipVisible, setTooltipVisible] = useState(false);
   const buttonRef = useRef(null);
   const [modalPosition, setModalPosition] = useState({ x: 0, y: 0 });
@@ -106,4 +106,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ToolTip;
+export default CustomToolTip;

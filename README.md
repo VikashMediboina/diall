@@ -1,5 +1,7 @@
 # Diall
 
+# FrontEnd
+
 ## Dependencies
 
 Make sure you have the following dependencies installed before running the project:
