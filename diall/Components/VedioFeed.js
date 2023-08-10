@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { View, TouchableOpacity, StyleSheet, Animated, Text ,Dimensions} from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Animated, Text ,Dimensions,Share} from 'react-native';
 // import Video from 'react-native-video';
 import Icon from 'react-native-vector-icons/Ionicons';
 // import { Video } from 'expo-av';
@@ -33,10 +33,27 @@ const VedioFeed = ({ videoUrl,isCurrent }) => {
 
   const onShare = async () => {
     setIsPlaying(true)
+    // try {
+    //   await Sharing.shareAsync(videoUrl);
+    // } catch (error) {
+    //   console.error('Error sharing video:', error);
+    // }
     try {
-      await Sharing.shareAsync(videoUrl);
+      const result = await Share.share({
+        message:
+          videoUrl,
+      });
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // shared with activity type of result.activityType
+        } else {
+          // shared
+        }
+      } else if (result.action === Share.dismissedAction) {
+        // dismissed
+      }
     } catch (error) {
-      console.error('Error sharing video:', error);
+      Alert.alert(error.message);
     }
   };
 
@@ -140,7 +157,7 @@ const styles = StyleSheet.create({
   },
   shareButton: {
     position: 'absolute',
-    bottom: 40,
+    bottom: 80,
     right: 10,
     backgroundColor: 'rgba(0, 0, 0, 0.6)',
     padding: 5,
