@@ -8,8 +8,8 @@ const Watch = ({ navigation }) => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const videoData = [
-    { id: '1', url: 'https://www.youtube.com/shorts/n1dPik4LzIE' },
-    { id: '2', url: 'https://youtube.com/shorts/2ox6SllUD2o?feature=share' },
+    { id: '1', url: 'https://www.youtube.com/shorts/n1dPik4LzIE',userName:'QuinnTyminskiOTD', title:'How do I get over my ex?'},
+    { id: '2', url: 'https://youtube.com/shorts/2ox6SllUD2o?feature=share',userName:'QuinnTyminskiOTD', title:'FOMO' },
     // Add more video URLs as needed
   ];
   const onViewableItemsChanged = ({ viewableItems }) => {
@@ -26,7 +26,7 @@ const Watch = ({ navigation }) => {
     onViewableItemsChanged },
   ]);
 
-  const renderVideoItem = ({ item,index }) => <VedioFeed videoUrl={item.url} isCurrent={index === activeIndex}/>;
+  const renderVideoItem = ({ item,index }) => <VedioFeed videoData={item} isCurrent={index === activeIndex}/>;
 
   return (
     <View style={styles.veideoFeedSpace}>

@@ -8,7 +8,7 @@ import * as Sharing from 'expo-sharing';
 import { useNavigation,useIsFocused } from '@react-navigation/native';
 import LinearProgressBar from './LinearProgressBar';
 
-const VedioFeed = ({ videoUrl,isCurrent }) => {
+const VedioFeed = ({ videoData,isCurrent }) => {
   const [isPlaying, setIsPlaying] = useState(true);
   const [videoDuration, setVideoDuration] = useState(0);
   const [currentPosition, setCurrentPosition] = useState(0);
@@ -42,7 +42,7 @@ const VedioFeed = ({ videoUrl,isCurrent }) => {
     try {
       const result = await Share.share({
         message:
-          videoUrl,
+        videoData.url,
       });
       if (result.action === Share.sharedAction) {
         if (result.activityType) {
@@ -144,7 +144,14 @@ const getPlayColor=()=> isPlaying?'black':'white'
         {!isPlaying && <Image source={require('diall/assets/Play.png')} style={styles.centeredImage} />}
       </View>
       </TouchableWithoutFeedback>
-           
+           <View style={[{position:'absolute',marginBottom:20},getbottomBox()]}>
+            <Text style={{color:'#007AFF',fontWeight:'600',fontSize:16,textShadow:'rgba(0, 0, 0, 0.10)'}}>
+              @{videoData?.userName}
+            </Text>
+            <Text style={{color:'#FFFFFF',textShadowColor:'rgba(0, 0, 0, 0.10)',fontSize:16,fontWeight:'400 '}}>
+              {videoData?.title}
+            </Text>
+           </View>
 
       <View style={styles.videoInfoContainer} >
         <Animated.View style={[styles.progressIndicator, {
