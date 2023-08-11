@@ -11,7 +11,9 @@ import Svg, { Circle, Rect } from 'react-native-svg';
 import CustomToolTip from '../../../Components/CustomToolTip';
 
 
-const Record = ({ navigation }) => {
+const Record = ({ route,navigation }) => {
+    const routerdetails = route.params;
+
     const isScreenFocused = useIsFocused()
     const [hasPermission, setHasPermission] = useState(null);
     const [hasCameraPermission, setHasCameraPermission] = useState(null);
@@ -88,7 +90,7 @@ const Record = ({ navigation }) => {
         if (vediorecording?.uri) {
 
 
-            navigation.navigate('PlayRecord', { 'vediorecording': vediorecording })
+            navigation.navigate('PlayRecord', { 'vediorecording': vediorecording, 'therapistDetails':routerdetails?.therapistDetails})
         }
     }, [vediorecording])
 

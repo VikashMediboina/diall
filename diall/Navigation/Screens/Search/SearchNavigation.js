@@ -1,23 +1,26 @@
-import React from 'react';
-
+import { View, Text } from 'react-native'
+import React from 'react'
 import { createStackNavigator } from '@react-navigation/stack';
-import Record from './Record';
-import PlayRecordVedioe from './PlayRecordVedioe';
+import Record from '../Ask/Record';
+import PlayRecordVedioe from '../Ask/PlayRecordVedioe';
+import SearchPage from './SearchPage';
+
 
 
 const Stack = createStackNavigator();
 
-const Ask = ({ navigation }) => {
- 
+
+const SearchNavigation = () => {
   return (
     <Stack.Navigator 
     screenOptions={{
       headerShown: false}}>
+
+      <Stack.Screen name="Search" component={SearchPage} />
       <Stack.Screen name="Record" component={Record} />
       <Stack.Screen name="PlayRecord" component={PlayRecordVedioe} />
     </Stack.Navigator>
-  );
+  )
 }
 
-
-export default Ask;
+export default SearchNavigation

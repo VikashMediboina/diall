@@ -4,7 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 // import { Container } from './styles';
 import Ask from './Screens/Ask/Ask';
-import Search from './Screens/Search';
+import SearchNavigation from './Screens/Search/SearchNavigation';
 import Watch from './Screens/Watch';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
@@ -36,7 +36,7 @@ const Container = () => {
             <Image source={require('../assets/Ask.png')} style={{ width: 2*size/3, height: 2*size/3, tintColor: color }} />
           ),
         }} />
-      <Tab.Screen name="Search" component={Search}
+      <Tab.Screen name="Search" component={SearchNavigation}
         options={{
           tabBarIcon: ({ color, size }) => (
             <Image source={require('../assets/search.png')} style={{ width: 2*size/3, height: 2*size/3, tintColor: color }} />

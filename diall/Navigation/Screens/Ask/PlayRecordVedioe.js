@@ -3,7 +3,12 @@ import React, { useEffect, useState } from 'react'
 import { Video } from 'expo-av';
 import { FontAwesome } from 'react-native-vector-icons';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { getDownloadURL, ref,uploadBytesResumable } from 'firebase/storage';
+import { db, storage } from '../../../firebaseconfig';
 // import { deleteFileInCache } from '../../../utils/utils';
+import * as MediaLibrary from 'expo-media-library';
+import * as FileSystem from 'expo-file-system';
+import { addDoc, collection } from 'firebase/firestore';
 
 const PlayRecordVedioe = ({ route, navigation }) => {
     const [inputValue, setInputValue] = useState('');
@@ -11,6 +16,66 @@ const PlayRecordVedioe = ({ route, navigation }) => {
     const handleInputChange = (text) => {
         setInputValue(text);
     };
+
+const uploadVedioe= async ()=>{
+    try{
+    console.log(vediorecording.uri)
+      const response = await fetch(vediorecording.uri);
+      const videoBlob = await response.blob();
+    // const videoRecording = await MediaLibrary.createAssetAsync(vediorecording.uri);
+    // const videoUri = videoRecording.uri;
+
+    // const blob = await FileSystem.readAsStringAsync(videoUri, {
+    //   encoding: 'base64',
+    // });
+
+const blob=videoBlob
+console.log(blob)
+   const storageRef=ref(storage,"Data/"+ new Date().getTime())
+   const uploadTask = uploadBytesResumable(storageRef, blob);
+  
+   uploadTask.on(
+    'state_changed',
+    (snapshot) => {
+      // Upload progress here
+      const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+      console.log(`Upload is ${progress}% done`);
+    },
+    (error) => {
+      // Handle upload error
+      console.error('Upload error:', error);
+    },
+    async () => {
+      // Upload completed successfully
+     getDownloadURL(uploadTask.snapshot.ref).then(async (url)=>{
+console.log(url)
+await saveRecord(url)
+     })
+
+    //   const firestoreRef = firebase.firestore().collection('videos');
+    //   await firestoreRef.add({
+    //     name: videoName,
+    //     url: videoUrl,
+    //   });
+
+    //   console.log('Video uploaded and data stored successfully.'+videoUrl);
+    }
+  );
+}
+ catch (error) {
+console.error('Error:', error);
+}
+}
+const saveRecord =async(url)=>{
+    try{
+const docRef=await addDoc(collection(db,'data'),{
+     id:new Date().getTime() , url:url ,userName:'MSD', title:inputValue,therapist:'Anonymosly'
+})
+    }
+    catch(e){
+        console.log(e)
+    }
+}
 const goBackNavigation=()=>{
     // deleteFileInCache(vediorecording?.uri)
    navigation.goBack()
@@ -66,11 +131,11 @@ const goBackNavigation=()=>{
               style={styles.backButton}
               onPress={goBackNavigation}
             />
-             <TouchableOpacity style={styles.buttonContainer}>
+            {inputValue&& <TouchableOpacity style={styles.buttonContainer} onPress={uploadVedioe}>
 
     <Image source={require('diall/assets/SendButton.png')} style={styles.customIcon}/>
         
-  </TouchableOpacity>
+  </TouchableOpacity>}
         </View>
         </KeyboardAwareScrollView>
 

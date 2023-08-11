@@ -25,9 +25,9 @@ const VedioFeed = ({ videoData,isCurrent }) => {
     togglePlayPause();
     if (videoPlayer.current) {
       if (isPlaying) {
-        videoPlayer.current.pauseAsync();
+        videoPlayer.current?.pauseAsync();
       } else {
-        videoPlayer.current.playAsync();
+        videoPlayer.current?.playAsync();
       }
     }
   };
@@ -88,14 +88,14 @@ const VedioFeed = ({ videoData,isCurrent }) => {
   useEffect(() => {
     if (isCurrent && isFocused) {
       setIsPlaying(true)
-      videoPlayer.current.playAsync();
+      videoPlayer.current?.playAsync();
     } else {
       setIsPlaying(false)
-      videoPlayer.current.pauseAsync();
+      videoPlayer.current?.pauseAsync();
     }
     return () => {
       if (isPlaying) {
-        videoPlayer.current.pauseAsync();
+        videoPlayer.current?.pauseAsync();
         setIsPlaying(false);
       }
     };
@@ -127,7 +127,7 @@ const getPlayColor=()=> isPlaying?'black':'white'
 
         <Video
           ref={videoPlayer}
-          source={{ uri: 'https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4' }}
+          source={{ uri: videoData.url }}
           useNativeControls={false}
           isLooping
           style={[styles.video,{tintColor:getPlayColor()}]}
@@ -144,11 +144,11 @@ const getPlayColor=()=> isPlaying?'black':'white'
         {!isPlaying && <Image source={require('diall/assets/Play.png')} style={styles.centeredImage} />}
       </View>
       </TouchableWithoutFeedback>
-           <View style={[{position:'absolute',marginBottom:20},getbottomBox()]}>
-            <Text style={{color:'#007AFF',fontWeight:'600',fontSize:16,textShadow:'rgba(0, 0, 0, 0.10)'}}>
+           <View style={[{position:'absolute',marginBottom:20,marginLeft:10},getbottomBox()]}>
+            <Text style={{color:'#007AFF',fontWeight:'600',fontSize:16,textShadowColor:'rgba(0, 0, 0, 0.10)'}}>
               @{videoData?.userName}
             </Text>
-            <Text style={{color:'#FFFFFF',textShadowColor:'rgba(0, 0, 0, 0.10)',fontSize:16,fontWeight:'400 '}}>
+            <Text style={{color:'#FFFFFF',textShadowColor:'rgba(0, 0, 0, 0.10)',fontSize:16,fontWeight:'400'}}>
               {videoData?.title}
             </Text>
            </View>
