@@ -6,14 +6,6 @@ import { db } from '../../../firebaseconfig';
 
 
 
-
-// const usersData = [
-//     { id: 1, name: 'John Doe', role: 'Admin', imgSource: 'https://reactnative.dev/img/tiny_logo.png' },
-//     { id: 2, name: 'Jane Smith', role: 'User', imgSource: 'diall/assets/favicon.png' },
-//     { id: 3, name: 'Michael Johnson', role: 'User', imgSource: 'diall/assets/favicon.png' },
-//     // ... other user data
-// ];
-
 const SearchPage = ({ navigation }) => {
     const [searchText, setSearchText] = useState('');
     const [searchResults, setSearchResults] = useState([]);
@@ -41,11 +33,6 @@ const SearchPage = ({ navigation }) => {
         return unsubscribe
       }, [])
     const onShare = async () => {
-        // try {
-        //   await Sharing.shareAsync(videoUrl);
-        // } catch (error) {
-        //   console.error('Error sharing video:', error);
-        // }
         try {
             const result = await Share.share({
                 message: 'Hello therapist! I found this app that could help us with our sessions. You can install it from the App Store: https://apps.apple.com/app/apple-store/id6446042096',
@@ -124,7 +111,6 @@ const SearchPage = ({ navigation }) => {
                         </>
                     }
                 </View>}
-
         </View>
     );
 };
