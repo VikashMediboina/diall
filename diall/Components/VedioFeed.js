@@ -70,14 +70,17 @@ const VedioFeed = ({ videoData,isCurrent }) => {
   useEffect(() => {
     if (isPlaying) {
       const interval = setInterval(async () => {
-        const { positionMillis } = await videoPlayer.current.getStatusAsync();
-        setCurrentPosition((positionMillis / videoDuration) * 100);
-        const progress = (positionMillis / videoDuration) * 100;
-        Animated.timing(progressAnimation, {
-          toValue: progress,
-          duration: 50, // Adjust animation duration as needed
-          useNativeDriver: false,
-        }).start();
+        if(videoDuration){
+          const { positionMillis } = await videoPlayer.current.getStatusAsync();
+          const progress = Number(positionMillis / videoDuration) * 100>0?Number(positionMillis / videoDuration) * 100:0;
+          setCurrentPosition(progress);
+          Animated.timing(progressAnimation, {
+            toValue: progress,
+            duration: 50, // Adjust animation duration as needed
+            useNativeDriver: false,
+          }).start();
+        }
+      
       }, 50);
       return () => clearInterval(interval);
     }

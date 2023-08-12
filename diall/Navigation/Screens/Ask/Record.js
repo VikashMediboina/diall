@@ -11,7 +11,7 @@ import Svg, { Circle, Rect } from 'react-native-svg';
 import CustomToolTip from '../../../Components/CustomToolTip';
 
 
-const Record = ({ route,navigation }) => {
+const Record = ({ route, navigation }) => {
     const routerdetails = route.params;
 
     const isScreenFocused = useIsFocused()
@@ -90,21 +90,14 @@ const Record = ({ route,navigation }) => {
         if (vediorecording?.uri) {
 
 
-            navigation.navigate('PlayRecord', { 'vediorecording': vediorecording, 'therapistDetails':routerdetails?.therapistDetails})
+            navigation.navigate('PlayRecord', { 'vediorecording': vediorecording, 'therapistDetails': routerdetails?.therapistDetails })
         }
     }, [vediorecording])
 
     useFocusEffect(
         React.useCallback(() => {
-            // Start camera here
-            //   Camera.resumePreview()
-            if (hasPermission) {
-                // cameraRef.current.startPreviewAsync();
-
-            }
             return () => {
                 // Stop camera here
-                // cameraRef.current.pausePreviewAsync();
                 setProgress(0)
                 setIsRecording(false)
             };
@@ -180,9 +173,9 @@ const Record = ({ route,navigation }) => {
                             )}
                         </View>
                     </Camera>}
-                    <View style={{position:'absolute',top:50,right:40}}>
-                   <CustomToolTip />
-                        </View>
+                    <View style={{ position: 'absolute', top: 50, right: 40 }}>
+                        <CustomToolTip />
+                    </View>
                 </View>
 
 
@@ -246,7 +239,6 @@ const styles = StyleSheet.create({
     video: {
         height: Dimensions.get('window').height,
         width: Dimensions.get('window').width,
-        // aspectRatio: 9 / 16, // Portrait aspect ratio
     },
     input: {
         position: 'absolute',

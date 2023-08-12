@@ -12,11 +12,12 @@ const Stack = createStackNavigator();
 
 const SearchNavigation = () => {
   return (
-    <Stack.Navigator 
-    screenOptions={{
-      headerShown: false}}>
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false
+      }}>
 
-      <Stack.Screen name="Search" component={SearchPage} />
+      <Stack.Screen name="SearchPage" component={SearchPage} />
       <Stack.Screen name="Record" component={Record} />
       <Stack.Screen name="PlayRecord" component={PlayRecordVedioe} />
     </Stack.Navigator>
