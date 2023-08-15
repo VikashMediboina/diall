@@ -3,6 +3,7 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import Record from './Record';
 import PlayRecordVedioe from './PlayRecordVedioe';
+import SearchPage from '../Search/SearchPage';
 
 // Create a stack navigator
 const Stack = createStackNavigator();
@@ -20,6 +21,8 @@ const Ask = ({ navigation }) => {
       <Stack.Screen name="Record" component={Record} />
       {/* Add a screen for playing recorded videos */}
       <Stack.Screen name="PlayRecord" component={PlayRecordVedioe} />
+      {/*Search Page */}
+      <Stack.Screen name="SearchPage" component={SearchPage} />
     </Stack.Navigator>
   );
 }

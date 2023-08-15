@@ -2,14 +2,20 @@ import { collection, onSnapshot } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Image, Share } from 'react-native';
 import { db } from '../../../firebaseconfig';
+import { addDoc } from 'firebase/firestore';
+import { Amplify, Storage } from 'aws-amplify';
 
 
 
 
-const SearchPage = ({ navigation }) => {
+const SearchPage = ({ navigation,route }) => {
     const [searchText, setSearchText] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [usersData,setUsersData]=useState([])
+    const [loading, setLoding] = useState(false);
+    const { vediorecording } = route.params;
+    const { title } = route.params;
+
     const handleSearch = (userSearchString) => {
         if (userSearchString) {
             const filteredResults = usersData.filter(user =>
@@ -47,6 +53,54 @@ const SearchPage = ({ navigation }) => {
             Alert.alert(error.message);
         }
     };
+     // Upload the recorded video
+     const uploadVedioe = async (item) => {
+        try {
+            setLoding(true);
+            const response = await fetch(vediorecording.uri);
+            const videoBlob = await response.blob();
+            const blob = videoBlob;
+
+            // Upload video to AWS S3 using Amplify Storage
+            const id=new Date().getTime() 
+            await Storage.put(id+ '.mp4', blob, {
+                level: 'public',
+                expires:null
+            }).then((res) => {
+                // Get the URL of the uploaded video
+                Storage.get(res.key)
+                    .then((url) => {
+                        const full_url='https://diall3f29946034eb4a6493e0bc724085a09663201-dev.s3.amazonaws.com/public/'+id+ '.mp4'
+                        saveRecord(full_url);
+                    })
+                    .catch((err) => {
+                        console.log('Error getting URL:', err);
+                    });
+            }).catch((err) => {
+                console.log('Error uploading file:', err);
+            });
+        } catch (err) {
+            console.log('Error uploading file:', err);
+        }
+    };
+
+    // Save record data to Firebase Firestore
+    const saveRecord = async (url) => {
+        try {
+            const docRef = await addDoc(collection(db, 'data'), {
+                id: new Date().getTime(),
+                url: url,
+                userName: 'MSD',
+                title: title,
+                therapist: searchText || 'Anonymously',
+            });
+            setLoding(false);
+            navigation.navigate('Record');
+        } catch (e) {
+            setLoding(false);
+            console.log(e);
+        }
+    };
 
     const handleClearSearch = () => {
         setSearchText('');
@@ -68,9 +122,9 @@ const SearchPage = ({ navigation }) => {
                 <Text style={styles.userName}>@{item.name}</Text>
                 <Text style={styles.userRole}>{item.role}</Text>
             </View>
-            <TouchableOpacity style={styles.askButton} onPress={() => navigation.navigate('Record', { 'therapistDetails': item })}>
-                <Text style={styles.askText}>Ask</Text>
-            </TouchableOpacity>
+            { loading?<View style={styles.askButton}><Text style={styles.askText}>...Loading</Text></View>: <TouchableOpacity style={styles.askButton} onPress={() => uploadVedioe(item)}>
+           <Text style={styles.askText}>Send</Text>
+            </TouchableOpacity>}
         </View>
     );
 

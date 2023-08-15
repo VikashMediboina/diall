@@ -133,7 +133,7 @@ const PlayRecordVedioe = ({ route, navigation }) => {
                         />
                         {/* Button to upload video */}
                         {inputValue ? (
-                            <TouchableOpacity style={styles.buttonContainer} onPress={uploadVedioe}>
+                            <TouchableOpacity style={styles.buttonContainer} onPress={()=>navigation.navigate('SearchPage', { 'vediorecording': vediorecording ,'title':inputValue})}>
                                 <Image source={require('diall/assets/SendButton.png')} style={styles.customIcon} />
                             </TouchableOpacity>):null
                         }

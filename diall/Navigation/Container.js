@@ -34,12 +34,12 @@ const Container = () => {
               <Image source={require('../assets/Ask.png')} style={{ width: 2 * size / 3, height: 2 * size / 3, tintColor: color }} />
             ),
           }} />
-        <Tab.Screen name="Search" component={SearchNavigation}
+        {/* <Tab.Screen name="Search" component={SearchNavigation}
           options={{
             tabBarIcon: ({ color, size }) => (
               <Image source={require('../assets/search.png')} style={{ width: 2 * size / 3, height: 2 * size / 3, tintColor: color }} />
             ),
-          }} />
+          }} /> */}
       </Tab.Navigator></NavigationContainer>
   );
 }
