@@ -3,18 +3,22 @@ import { View, FlatList, StyleSheet, Dimensions } from 'react-native';
 import VedioFeed from '../../Components/VedioFeed';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebaseconfig';
+import { useFocusEffect } from '@react-navigation/native';
+
 
 
 const Watch = ({ navigation }) => {
+  
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [videoData, setVideoData] = useState(
     [
-      { id: '1', url: 'https://firebasestorage.googleapis.com/v0/b/diall-22180.appspot.com/o/Data%2FScreen%20Recording%202023-08-12%20at%203.42.55%20AM.mov?alt=media&token=8b4a5f3c-2157-44f0-8ca5-4aa07ac897fa', userName: 'QuinnTyminskiOTD', title: 'How do I get over my ex?' },
-      { id: '2', url: 'https://firebasestorage.googleapis.com/v0/b/diall-22180.appspot.com/o/Data%2FScreen%20Recording%202023-08-12%20at%203.35.13%20AM.mov?alt=media&token=35d7765f-4791-4828-9706-d310054ea872', userName: 'QuinnTyminskiOTD', title: 'FOMO' },
-      { id: '3', url: 'https://firebasestorage.googleapis.com/v0/b/diall-22180.appspot.com/o/Data%2FScreen%20Recording%202023-08-12%20at%203.46.46%20AM.mov?alt=media&token=8b84bdac-56ba-4869-85ea-e97a4909c130', userName: 'Isbat', title: 'How to overcome anxity?' },
-      // Add more video URLs as needed
+
     ]);
+    const [actvideoData, setactVideoData] = useState(
+      [
+  
+      ]);
   const onViewableItemsChanged = ({ viewableItems }) => {
     const activeItem = viewableItems[0];
     if (activeItem) {
@@ -22,17 +26,27 @@ const Watch = ({ navigation }) => {
     }
   };
   const handleEndReached = () => {
-    setVideoData([...videoData, ...videoData])
+    setVideoData([...videoData, ...actvideoData])
   }
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, 'data'), (snapshot) => {
-      snapshot.docChanges().forEach((change) => {
-        if (change.type === "added") {
-          setVideoData((prevData) => [ change.doc.data(), ...prevData])
-        }
-      })
-    })
+    try {
+     const unsubscribe = onSnapshot(collection(db, 'data'), (snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+          if (change.type === "added") {
+            if(videoData===0){
+              setVideoData((prevData) => [change.doc.data()]);
+            }
+            else{
+              setVideoData((prevData) => [change.doc.data(), ...prevData]);
+            }
+            setactVideoData((prevData) => [change.doc.data(),...prevData]);
+          }
+        });
+      });
     return unsubscribe
+    } catch (error) {
+      console.error("Firestore onSnapshot error:", error);
+    }
   }, [])
   const viewabilityConfigCallbackPairs = useRef([
 
@@ -44,6 +58,14 @@ const Watch = ({ navigation }) => {
     },
   ]);
 
+// Effect to clear vedio data state when screen loses focus
+useFocusEffect(
+  React.useCallback(() => {
+      return () => {
+         setVideoData(actvideoData)
+      };
+  }, [])
+);
   const renderVideoItem = ({ item, index }) => <VedioFeed videoData={item} isCurrent={index === activeIndex} />;
 
   return (

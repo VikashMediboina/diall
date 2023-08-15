@@ -1,26 +1,29 @@
+// Import necessary libraries and components
 import React, { useRef, useState, useEffect } from 'react';
-import { View, TouchableOpacity, StyleSheet, Animated, Text ,Dimensions,Share,Platform, Image,TouchableWithoutFeedback} from 'react-native';
-// import Video from 'react-native-video';
+import { View, TouchableOpacity, StyleSheet, Animated, Text, Dimensions, Share, Platform, Image, TouchableWithoutFeedback } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-// import { Video } from 'expo-av';
-import { Video, ResizeMode } from 'expo-av';
+import { Video, ResizeMode } from 'expo-av'; // Expo Video component
 import * as Sharing from 'expo-sharing';
-import { useNavigation,useIsFocused } from '@react-navigation/native';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
 import LinearProgressBar from './LinearProgressBar';
 
-const VedioFeed = ({ videoData,isCurrent }) => {
+// Component: VedioFeed
+const VedioFeed = ({ videoData, isCurrent }) => {
+  // State variables
   const [isPlaying, setIsPlaying] = useState(true);
   const [videoDuration, setVideoDuration] = useState(0);
   const [currentPosition, setCurrentPosition] = useState(0);
-  const [status, setStatus] = React.useState({ isPlaying: true });
   const videoPlayer = useRef(null);
   const progressAnimation = useRef(new Animated.Value(0)).current;
   const navigation = useNavigation();
   const isFocused = useIsFocused();
+
+  // Function to toggle play/pause of the video
   const togglePlayPause = () => {
     setIsPlaying(!isPlaying);
   };
 
+  // Function to handle video press
   const onVideoPress = () => {
     togglePlayPause();
     if (videoPlayer.current) {
@@ -32,47 +35,42 @@ const VedioFeed = ({ videoData,isCurrent }) => {
     }
   };
 
+  // Function to share the video
   const onShare = async () => {
-    setIsPlaying(true)
-    // try {
-    //   await Sharing.shareAsync(videoUrl);
-    // } catch (error) {
-    //   console.error('Error sharing video:', error);
-    // }
+    setIsPlaying(true);
     try {
       const result = await Share.share({
-        message:
-        videoData.url,
+        message: videoData.url,
       });
       if (result.action === Share.sharedAction) {
         if (result.activityType) {
-          // shared with activity type of result.activityType
+          // Shared with a specific activity type
         } else {
-          // shared
+          // Shared
         }
       } else if (result.action === Share.dismissedAction) {
-        // dismissed
+        // Dismissed
       }
     } catch (error) {
       Alert.alert(error.message);
     }
   };
 
+  // Function to handle playback status update
   const handlePlaybackStatusUpdate = (data) => {
-    if(data.isLoaded){
+    if (data.isLoaded) {
       setVideoDuration(data.durationMillis);
       setCurrentPosition(0);
     }
-    
   };
 
-  
+  // Update progress animation based on video position
   useEffect(() => {
     if (isPlaying) {
       const interval = setInterval(async () => {
-        if(videoDuration){
+        if (videoDuration) {
           const { positionMillis } = await videoPlayer.current.getStatusAsync();
-          const progress = Number(positionMillis / videoDuration) * 100>0?Number(positionMillis / videoDuration) * 100:0;
+          const progress = Number(positionMillis / videoDuration) * 100 > 0 ? Number(positionMillis / videoDuration) * 100 : 0;
           setCurrentPosition(progress);
           Animated.timing(progressAnimation, {
             toValue: progress,
@@ -80,20 +78,18 @@ const VedioFeed = ({ videoData,isCurrent }) => {
             useNativeDriver: false,
           }).start();
         }
-      
       }, 50);
       return () => clearInterval(interval);
     }
   }, [isPlaying, videoDuration]);
 
-
-
+  // Control video play/pause based on focus state
   useEffect(() => {
     if (isCurrent && isFocused) {
-      setIsPlaying(true)
+      setIsPlaying(true);
       videoPlayer.current?.playAsync();
     } else {
-      setIsPlaying(false)
+      setIsPlaying(false);
       videoPlayer.current?.pauseAsync();
     }
     return () => {
@@ -102,10 +98,9 @@ const VedioFeed = ({ videoData,isCurrent }) => {
         setIsPlaying(false);
       }
     };
-  }, [isCurrent,isFocused]);
+  }, [isCurrent, isFocused]);
 
-
-
+  // Pause video playback when navigating away from the screen
   useEffect(() => {
     const unsubscribe = navigation.addListener('blur', () => {
       if (isPlaying) {
@@ -117,80 +112,93 @@ const VedioFeed = ({ videoData,isCurrent }) => {
     return unsubscribe;
   }, [navigation]);
 
+  // Determine bottom box position based on platform
   const getbottomBox = () => {
     if (Platform.OS === 'ios') {
-      return {bottom:80};
+      return { bottom: 80 };
     }
-    return {bottom:20};
+    return { bottom: 20 };
   };
-const getPlayColor=()=> isPlaying?'black':'white'
+
+  // Determine play button color based on playback state
+  const getPlayColor = () => isPlaying ? 'black' : 'white';
+
+  // Render component
   return (
     <View style={[styles.videoContainer]}>
+      {/* Video Press Handler */}
       <TouchableOpacity onPress={onVideoPress}>
         <Video
           ref={videoPlayer}
           source={{ uri: videoData.url }}
           useNativeControls={false}
           isLooping
-          style={[styles.video,{tintColor:getPlayColor()}]}
+          style={[styles.video, { tintColor: getPlayColor() }]}
           onLoad={handlePlaybackStatusUpdate}
           resizeMode="cover"
           shouldPlay={isPlaying}
-          
         />
-    {!isPlaying && <View style={styles.overlay} />}
+        {/* Show overlay when video is paused */}
+        {!isPlaying ? <View style={styles.overlay} />:null}
       </TouchableOpacity>
-      <TouchableWithoutFeedback onPress={onVideoPress}>
-      <View style={styles.videoContainer}>
-        {/* Conditional rendering of image */}
-        {!isPlaying && <Image source={require('diall/assets/Play.png')} style={styles.centeredImage} />}
-      </View>
-      </TouchableWithoutFeedback>
-           <View style={[{position:'absolute',marginBottom:20,marginLeft:10},getbottomBox()]}>
-            <Text style={{color:'#007AFF',fontWeight:'600',fontSize:16,textShadowColor:'rgba(0, 0, 0, 0.10)'}}>
-              @{videoData?.userName}
-            </Text>
-            <Text style={{color:'#FFFFFF',textShadowColor:'rgba(0, 0, 0, 0.10)',fontSize:16,fontWeight:'400'}}>
-              {videoData?.title}
-            </Text>
-           </View>
 
-      <View style={styles.videoInfoContainer} >
+      {/* Overlay for play button */}
+      <TouchableWithoutFeedback onPress={onVideoPress}>
+        <View style={styles.videoContainer}>
+          {!isPlaying ? <Image source={require('diall/assets/Play.png')} style={styles.centeredImage} />:null}
+        </View>
+      </TouchableWithoutFeedback>
+
+      {/* Bottom user and video information */}
+      <View style={[{ position: 'absolute', marginBottom: 20, marginLeft: 10 }, getbottomBox()]}>
+        <Text style={{ color: '#007AFF', fontWeight: '600', fontSize: 16, textShadowColor: 'rgba(0, 0, 0, 0.10)' }}>
+          @{videoData?.userName}
+        </Text>
+        <Text style={{ color: '#FFFFFF', textShadowColor: 'rgba(0, 0, 0, 0.10)', fontSize: 16, fontWeight: '400' }}>
+          {videoData?.title}
+        </Text>
+      </View>
+
+      {/* Video progress bar and share button */}
+      <View style={styles.videoInfoContainer}>
+        {/* Animated progress indicator */}
         <Animated.View style={[styles.progressIndicator, {
           width: progressAnimation.interpolate({
             inputRange: [0, 100],
             outputRange: ['0%', '100%'],
           })
         }]} />
+
+        {/* Share button */}
         <TouchableOpacity style={styles.shareButton} onPress={onShare}>
-          {/* <Icon name="share" size={20} color="#ffffff" /> */}
-          <Image source={require('diall/assets/Send.png')} color="#ffffff"/>
+          <Image source={require('diall/assets/Send.png')} color="#ffffff" />
         </TouchableOpacity>
-        {isFocused&&<View style={[{position:'absolute'},getbottomBox()]}>
-        <LinearProgressBar progress={currentPosition} width={Dimensions.get('window').width} height={5}/>
-        </View>}
+
+        {/* Linear progress bar when focused */}
+        {isFocused ? <View style={[{ position: 'absolute' }, getbottomBox()]}>
+          <LinearProgressBar progress={currentPosition} width={Dimensions.get('window').width} height={5} />
+        </View>:null}
       </View>
     </View>
   );
 };
 
-
+// Styles for the component
 const styles = StyleSheet.create({
   videoContainer: {
     flex: 1,
     position: 'relative',
     alignContent: 'center',
-    // alignItems:'center',
-    justifyContent: 'center'  },
+    justifyContent: 'center'
+  },
   video: {
     height: Dimensions.get('window').height,
-    width:Dimensions.get('window').width,
+    width: Dimensions.get('window').width,
   },
   shareButton: {
     position: 'absolute',
     bottom: 90,
     right: 10,
-    // backgroundColor: 'rgba(0, 0, 0, 0.6)',
     padding: 5,
     borderRadius: 20,
   },
@@ -199,11 +207,12 @@ const styles = StyleSheet.create({
     height: 70,
     position: 'absolute',
     alignSelf: 'center',
-    bottom:Dimensions.get('window').height/2
+    bottom: Dimensions.get('window').height / 2
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0, 0, 0, 0.5)', // Dark overlay color
   },
 });
-export default VedioFeed
+
+export default VedioFeed;

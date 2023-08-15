@@ -1,132 +1,85 @@
-import { View,  StyleSheet, Dimensions, TextInput, KeyboardAvoidingView, Button, Image, TouchableOpacity, ActivityIndicator } from 'react-native'
-import React, { useEffect, useState } from 'react'
+// Import necessary components and libraries
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet, Dimensions, TextInput, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { Video } from 'expo-av';
 import { FontAwesome } from 'react-native-vector-icons';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 import { db, storage } from '../../../firebaseconfig';
 import { addDoc, collection } from 'firebase/firestore';
-// import client from '../../../awsconfig';
 import { Amplify, Storage } from 'aws-amplify';
 import awsmobile from '../../../src/aws-exports';
+
+// Configure Amplify with AWS Mobile settings
 Amplify.configure(awsmobile);
 
-
-// {Storage: {
-//     Auth: {
-//         // Use your Access Key credentials
-      
-//         region: 'us-east-2', // Amazon Cognito Region
-//         Credential:{
-//             accessKeyId: 'AKIAWN2ADJAWB5G2XZ6B',
-//             secretAccessKey: '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',
-//         }
-//         // // Specify the rest of the configuration
-//         // identityPoolId: 'XX-XXXX-X:XXXXXXXX-XXXX-1234-abcd-1234567890ab',
-//         // userPoolId: 'XX-XXXX-X_abcd1234',
-//         // userPoolWebClientId: 'XX-XXXX-X_abcd1234',
-//       },
-//     AWSS3: {
-//       bucket: 'daill', //REQUIRED -  Amazon S3 bucket name
-//       region: 'us-east-2', //OPTIONAL -  Amazon service region
-//       isObjectLockEnabled: false //OPTIONAl - Object Lock parameter
-//     }}
-
+// Component: PlayRecordVedioe
 const PlayRecordVedioe = ({ route, navigation }) => {
+    // State variables
     const [inputValue, setInputValue] = useState('');
+    const [loading, setLoding] = useState(false);
     const { vediorecording } = route.params;
-    const [loading,setLoding]=useState(false)
+
+    // Update inputValue state when text input changes
     const handleInputChange = (text) => {
         setInputValue(text);
     };
 
+    // Upload the recorded video
     const uploadVedioe = async () => {
         try {
-            setLoding(true)
+            setLoding(true);
             const response = await fetch(vediorecording.uri);
             const videoBlob = await response.blob();
+            const blob = videoBlob;
 
-            const blob = videoBlob
+            // Upload video to AWS S3 using Amplify Storage
+            const id=new Date().getTime() 
+            await Storage.put(id+ '.mp4', blob, {
+                level: 'public',
+                expires:null
+            }).then((res) => {
+                // Get the URL of the uploaded video
+                Storage.get(res.key)
+                    .then((url) => {
+                        const full_url='https://diall3f29946034eb4a6493e0bc724085a09663201-dev.s3.amazonaws.com/public/'+id+ '.mp4'
+                        saveRecord(full_url);
+                    })
+                    .catch((err) => {
+                        console.log('Error getting URL:', err);
+                    });
+            }).catch((err) => {
+                console.log('Error uploading file:', err);
+            });
+        } catch (err) {
+            console.log('Error uploading file:', err);
+        }
+    };
 
-
-
-            await Storage.put(new Date().getTime()+'.mp4', blob, {
-                // contentType: 'image/jpeg' // contentType is optional
-                level:'public',
-              }).then(res=>{
-                Storage.get(res.key).then(url=>{
-                    saveRecord(url)
-                    console.log(result)
-                }).catch( (err)=> 
-                    {console.log('Error uploading file:', err);}
-                )
-              }).catch ((err) =>
-               { console.log('Error uploading file:', err);}
-              
-              )
-            } catch (err) {
-              console.log('Error uploading file:', err);
-            }
-
-            // const command = new PutObjectCommand({
-            //     Bucket: "daill",
-            //     Key: new Date().getTime(),
-            //     Body: 'blob',
-            //   });
-            
-            //   try {
-            //     const response = await client.send(command);
-            //     console.log(response);
-            //   } catch (err) {
-            //     console.error(err);
-            //   }
-
-
-
-            // const storageRef = ref(storage, "Data/" + new Date().getTime())
-            // const uploadTask = uploadBytesResumable(storageRef, blob);
-
-            // uploadTask.on(
-            //     'state_changed',
-            //     (snapshot) => {
-            //         // Upload progress here
-            //         const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            //         console.log(`Upload is ${progress}% done`);
-            //     },
-            //     (error) => {
-            //         // Handle upload error
-            //         console.error('Upload error:', error);
-            //     },
-            //     async () => {
-            //         // Upload completed successfully
-            //         getDownloadURL(uploadTask.snapshot.ref).then(async (url) => {
-            //             await saveRecord(url)
-            //         })
-            //     }
-            // );
-        // }
-        // catch (error) {
-        //     setLoding(false)
-        //     console.error('Error:', error);
-        // }
-    }
+    // Save record data to Firebase Firestore
     const saveRecord = async (url) => {
         try {
             const docRef = await addDoc(collection(db, 'data'), {
-                id: new Date().getTime(), url: url, userName: 'MSD', title: inputValue, therapist: route.params?.therapistDetails?route.params?.therapistDetails:'Anonymosly'
-            })
-            setLoding(false)
-            navigation.goBack()
+                id: new Date().getTime(),
+                url: url,
+                userName: 'MSD',
+                title: inputValue,
+                therapist: route.params?.therapistDetails || 'Anonymously',
+            });
+            setLoding(false);
+            navigation.goBack();
+        } catch (e) {
+            setLoding(false);
+            console.log(e);
         }
-        catch (e) {
-            setLoding(false)
-            console.log(e)
-        }
-    }
+    };
+
+    // Navigate back
     const goBackNavigation = () => {
-        // deleteFileInCache(vediorecording?.uri)
-        navigation.goBack()
-    }
+        navigation.goBack();
+    };
+
+    // Set custom header options
     React.useLayoutEffect(() => {
         navigation.setOptions({
             headerLeft: () => (
@@ -141,61 +94,60 @@ const PlayRecordVedioe = ({ route, navigation }) => {
         });
     }, [navigation]);
 
-
-
+    // Render component
     return (
         <KeyboardAwareScrollView keyboardShouldPersistTaps="handled">
-
-
             <View style={styles.videoContainer}>
-
+                {/* Display recorded video */}
                 <Video
-                    // ref={videoPlayer}
                     source={{ uri: vediorecording?.uri }}
                     useNativeControls={false}
                     resizeMode="cover"
                     isLooping
                     shouldPlay={true}
                     style={styles.video}
-                // onLoad={onLoad}
-                >
-
-                </Video>
-                {loading?<View style={styles.indicator}>
-                    <ActivityIndicator size="large" />
-                </View>:<>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Title of your question..."
-                    value={inputValue}
-                    onChangeText={handleInputChange}
-                    placeholderTextColor={'#FFFFFF'}
-                    maxLength={40}
-                >
-
-                </TextInput>
-                <FontAwesome
-                    name="times"
-                    size={24}
-                    color="black"
-                    style={styles.backButton}
-                    onPress={goBackNavigation}
                 />
-                {inputValue && <TouchableOpacity style={styles.buttonContainer} onPress={uploadVedioe}>
-
-                    <Image source={require('diall/assets/SendButton.png')} style={styles.customIcon} />
-
-                </TouchableOpacity>}
-                </>}
+                {/* Display loading indicator if loading */}
+                {loading ? (
+                    <View style={styles.indicator}>
+                        <ActivityIndicator size="large" />
+                    </View>
+                ) : (
+                    <>
+                        {/* Text input for title */}
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Title of your question..."
+                            value={inputValue}
+                            onChangeText={handleInputChange}
+                            placeholderTextColor={'#FFFFFF'}
+                            maxLength={40}
+                        />
+                        {/* Back button */}
+                        <FontAwesome
+                            name="times"
+                            size={24}
+                            color="black"
+                            style={styles.backButton}
+                            onPress={goBackNavigation}
+                        />
+                        {/* Button to upload video */}
+                        {inputValue ? (
+                            <TouchableOpacity style={styles.buttonContainer} onPress={uploadVedioe}>
+                                <Image source={require('diall/assets/SendButton.png')} style={styles.customIcon} />
+                            </TouchableOpacity>):null
+                        }
+                    </>
+                )}
             </View>
         </KeyboardAwareScrollView>
+    );
+};
 
-    )
-}
+// Styles
 const styles = StyleSheet.create({
     videoContainer: {
         flex: 1,
-        alignContent: 'center',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -209,14 +161,13 @@ const styles = StyleSheet.create({
         height: 67,
         borderWidth: 1,
         paddingHorizontal: 10,
-        borderColor: "#FFFFFF",
+        borderColor: '#FFFFFF',
         borderRadius: 20,
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        color: "#FFFFFF",
+        color: '#FFFFFF',
         fontWeight: 'bold',
         top: 150,
-        fontSize: 24
-
+        fontSize: 24,
     },
     backButton: {
         position: 'absolute',
@@ -224,7 +175,7 @@ const styles = StyleSheet.create({
         left: 30,
         width: 20,
         height: 20,
-        color: '#FFFFFF'
+        color: '#FFFFFF',
     },
     buttonContainer: {
         position: 'absolute',
@@ -232,10 +183,16 @@ const styles = StyleSheet.create({
         width: 260,
         height: 100,
     },
-    indicator:{
+    indicator: {
         flex: 1,
         justifyContent: 'center',
-        position:'absolute'
-    }
+        position: 'absolute',
+    },
+    customIcon: {
+        width: '100%',
+        height: '100%',
+        resizeMode: 'contain',
+    },
 });
-export default PlayRecordVedioe
+
+export default PlayRecordVedioe;

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "251761625616",
+    "project_id": "diall-22180",
+    "storage_bucket": "diall-22180.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:251761625616:android:47e0a74fe5b1268ad55895",
+        "android_client_info": {
+          "package_name": "com.diall"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "251761625616-vdafduct33u4sb83bmnhvm48tbqrga65.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBhhDz6133Qw3uj26vizgvPMjSz64saXt4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "251761625616-vdafduct33u4sb83bmnhvm48tbqrga65.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
