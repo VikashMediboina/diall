@@ -71,7 +71,7 @@ const SearchPage = ({ navigation,route }) => {
                 Storage.get(res.key)
                     .then((url) => {
                         const full_url='https://diall3f29946034eb4a6493e0bc724085a09663201-dev.s3.amazonaws.com/public/'+id+ '.mp4'
-                        saveRecord(full_url);
+                        saveRecord(full_url,item);
                     })
                     .catch((err) => {
                         console.log('Error getting URL:', err);
@@ -85,14 +85,14 @@ const SearchPage = ({ navigation,route }) => {
     };
 
     // Save record data to Firebase Firestore
-    const saveRecord = async (url) => {
+    const saveRecord = async (url,item) => {
         try {
             const docRef = await addDoc(collection(db, 'data'), {
                 id: new Date().getTime(),
                 url: url,
                 userName: 'MSD',
                 title: title,
-                therapist: searchText || 'Anonymously',
+                therapist: item || 'Anonymously',
             });
             setLoding(false);
             navigation.navigate('Record');
