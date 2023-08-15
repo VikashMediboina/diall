@@ -16,14 +16,25 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "permissions": ["RECORD_AUDIO","CAMERA"]
+      "permissions": [
+        "RECORD_AUDIO",
+        "CAMERA"
+      ],
+      "bundleIdentifier": "com.vikashmediboina.diall"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff",
-        "permissions": ["RECORD_AUDIO","CAMERA"]
-      }
+        "permissions": [
+          "RECORD_AUDIO",
+          "CAMERA"
+        ]
+      },
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -35,7 +46,11 @@
           "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera."
         }
       ]
-    ]
-
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "6dfe1ec4-a739-4fcc-9af4-2519e7b1f05f"
+      }
+    }
   }
 }

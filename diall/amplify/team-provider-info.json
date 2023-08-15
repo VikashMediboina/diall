@@ -1,0 +1,23 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-diall-dev-63201-authRole",
+      "UnauthRoleArn": "arn:aws:iam::441979193388:role/amplify-diall-dev-63201-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::441979193388:role/amplify-diall-dev-63201-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-diall-dev-63201-deployment",
+      "UnauthRoleName": "amplify-diall-dev-63201-unauthRole",
+      "StackName": "amplify-diall-dev-63201",
+      "StackId": "arn:aws:cloudformation:us-east-1:441979193388:stack/amplify-diall-dev-63201/f943f230-3b56-11ee-bcc9-121f61a75449",
+      "AmplifyAppId": "d24y300eblytre"
+    },
+    "categories": {
+      "auth": {
+        "diall5d7a61e4": {}
+      },
+      "storage": {
+        "s345b7f915": {}
+      }
+    }
+  }
+}

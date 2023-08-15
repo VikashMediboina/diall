@@ -127,7 +127,6 @@ const getPlayColor=()=> isPlaying?'black':'white'
   return (
     <View style={[styles.videoContainer]}>
       <TouchableOpacity onPress={onVideoPress}>
-
         <Video
           ref={videoPlayer}
           source={{ uri: videoData.url }}
